@@ -1,0 +1,20 @@
+{"Brand": "Other"
+        {"Model": "Other"
+            {"gethost": "true",
+             "getdeviceinfo": "true",
+             "getimage": "true",
+             "getnodes": "true",
+             "getstream": "true",
+             "getsnap": "true",
+             "getstatus": "true",
+             "getprofile": "true",
+             "getpresets": "true",
+             "gotohome": "true", 
+             "relativemove":"true",
+             "absolutemove":"true",
+             "removepreset":"true",
+             "setpreset":"true",
+             "gotopreset":"true",
+             "reboot":"true",
+             "setimagesettings":"true"}
+}
