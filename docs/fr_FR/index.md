@@ -12,7 +12,7 @@ Après téléchargement du plugin, il vous suffit juste d’activer celui-ci, et
 
 ## Dépendances
 
-Cette partie permet de valider et d’installer les dépendances requises au bon fonctionnement du plugin Zwave (aussi bien en local qu’en déporté, ici en local) ![configuration02](../images/configuration02.png)
+Cette partie permet de valider et d’installer les dépendances requises au bon fonctionnement du plugin. ![configuration02](../images/configuration02.png)
 
 -   Un Statut **OK** confirme que les dépendances sont satisfaites.
 -   Si le statut est **NOK**, il faudra réinstaller les dépendances à l’aide du bouton ![configuration03](../images/configuration03.png)
