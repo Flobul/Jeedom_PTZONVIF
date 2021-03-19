@@ -1,21 +1,19 @@
 {
-	"id" : "wifilightV2",
-	"name" : "wifilightV2",
-    "installation" : "Le plugin ne nécessite pas d'installation.",
-	"description" : "Pilote de nombreux périphériques wifi en local avec internet coupé : lampes, leds, prises, interrupteurs, thermostat, de marques diverses : Meross, Gateway Tuya/Zigbee dont SilverCrest Lidl, Sonoff, Tuya, Ewelink, Mi.Light, Yeelight, TP-Link, Nanoleaf ... Consulter la documentation pour connaitre la liste exacte des matériels compatibles.",
-	"licence" : "AGPL",
-	"author" : "Bernard Caron",
-	"require" : "3.0",
-	"category" : "devicecommunication",
-	"hasDependency" : false,
-	"hasOwnDeamon" : true,
-	"link" : {
-		"forum":"https://community.jeedom.com/t/plugin-wifilightv2-discussion-generale/2439"
+  "id" : "PTZONVIF",
+  "name": "Pilotage cameras ONVIF",
+  "licence": "GPL",
+  "require": "4.0",
+  "version": "1.0",
+  "category": "security",
+  "hasDependency": true,
+  "hasOwnDaemon": false,
+  "link" : {
+		"forum":"https://community.jeedom.com/t/presentation-plugin-ptzonvif-pilotage-des-cameras-onvif/"
 	},
-	"changelog" : "https://bcaro.github.io/wifilightV2-doc/#language#/changelog",
-    "documentation" : "https://bcaro.github.io/wifilightV2-doc/#language#/",
-	"language" : ["fr_FR","en_US","de_DE","sp_SP","it_IT"],
-	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"]
+  "maxDependancyInstallTime": 0,
+  "documentation": "https://github.com/freddye83/Jeedom_PTZONVIF",
+  "changelog": "https://www.perdu.com",
+  
+  "author": "Freddye83",
+  "compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"]
 }
-
-
