@@ -168,9 +168,21 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             </div>
                         </div>
 						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{Vitesse PTZ}}</label>
+                            <label class="col-lg-2 control-label">{{Vitesse X}}</label>
                             <div class="col-lg-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitPTZ"/>
+                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitX"/>
+                            </div>
+                        </div>
+						<div class="form-group">
+                            <label class="col-lg-2 control-label">{{Vitesse Y}}</label>
+                            <div class="col-lg-3">
+                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitY"/>
+                            </div>
+                        </div>
+						<div class="form-group">
+                            <label class="col-lg-2 control-label">{{Vitesse Z}}</label>
+                            <div class="col-lg-3">
+                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitZ"/>
                             </div>
                         </div>
 						<div class="form-group">
