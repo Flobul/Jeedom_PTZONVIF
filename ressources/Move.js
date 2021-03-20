@@ -4,7 +4,18 @@ const onvif = require('node-onvif');
  var myArgs = process.argv.slice(2);
 //console.log('myArgs: ', myArgs);
 
-
+// vitesse x
+if (parseFloat(myArgs[3]) != 0) {
+  var vitesse = parseInt(myArgs[6]);
+}
+// vitesse y
+if (parseFloat(myArgs[4]) != 0) {
+  var vitesse = parseInt(myArgs[7]);
+}
+// vitesse z
+if (parseFloat(myArgs[5]) != 0) {
+  var vitesse = parseInt(myArgs[8]);
+}
 // Create an OnvifDevice object
 let device = new onvif.OnvifDevice({
   xaddr: myArgs[0],
@@ -30,7 +41,7 @@ let params = {
 				{
 					console.error(error);
                 });
-                }, parseInt(myArgs[6]));
+                }, vitesse);
         });
         }).then(() => { }).catch((error) => {
 			console.error(error);
