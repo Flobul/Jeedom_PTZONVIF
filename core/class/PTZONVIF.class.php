@@ -404,7 +404,9 @@ class PTZONVIF extends eqLogic {
 			$PTZONVIF->setConfiguration('adresseip', $_Ip);
 			$PTZONVIF->setConfiguration('port', $_port);
 			$PTZONVIF->setConfiguration('URL', $_url);	
-			$PTZONVIF->setConfiguration('vitPTZ', "500");			
+			$PTZONVIF->setConfiguration('vitX', "500");	
+			$PTZONVIF->setConfiguration('vitY', "500");
+			$PTZONVIF->setConfiguration('vitZ', "500");			
 		}
 		else {
 			log::add('PTZONVIF', 'debug', 'Déjà connu  : '.$_Ip);
@@ -474,7 +476,9 @@ class PTZONVIFCmd extends cmd  {
 		$xaddrs=$eqLogic->getConfiguration('URL');
 		$username=$eqLogic->getConfiguration('username');
 		$password=$eqLogic->getConfiguration('password');
-		$vitPTZ=$eqLogic->getConfiguration('vitPTZ');
+		$vitX=$eqLogic->getConfiguration('vitX');
+		$vitY=$eqLogic->getConfiguration('vitY');
+		$vitZ=$eqLogic->getConfiguration('vitZ');
 		//
 		if ($this->getConfiguration('action') == 'preset') {
 			$preset = $this->getConfiguration('api') ;
@@ -547,22 +551,22 @@ class PTZONVIFCmd extends cmd  {
 			switch($this->getConfiguration('api'))
 			{
 				case 'up':
-					$commande .= " 0 1 0 ".$vitPTZ;
+					$commande .= " 0 1 0 ".$vitX;
 					break;
 				case 'down':
-					$commande .= " 0 -1 0 ".$vitPTZ;
+					$commande .= " 0 -1 0 ".$vitX;
 					break;
 				case 'left':
-					$commande .= " -1 0 0 ".$vitPTZ;
+					$commande .= " -1 0 0 ".$vitY;
 					break;
 				case 'right':
-					$commande .= " 1 0 0 ".$vitPTZ;
+					$commande .= " 1 0 0 ".$vitY;
 					break;
 				case 'ZoomIn':
-					$commande .= " 0 0 1 ".$vitPTZ;
+					$commande .= " 0 0 1 ".$vitZ;
 					break;
 				case 'ZoomOut':
-					$commande .= " 0 0 -1 ".$vitPTZ;
+					$commande .= " 0 0 -1 ".$vitZ;
 					break;
 
 			}		
