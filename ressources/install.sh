@@ -26,7 +26,7 @@ echo "Everything is successfully installed!"
 rm /tmp/PTZONVIF_dep
 
 
-echo "Fin d'nstallation des dependances"
+echo "Fin d'installation des dependances"
 
 touch /var/www/html/plugins/PTZONVIF/ressources/PTZONVIF_version
   
