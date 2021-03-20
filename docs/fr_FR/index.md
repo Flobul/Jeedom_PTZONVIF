@@ -1,6 +1,3 @@
-# Changelog
-
-
 # Présentation
 
 Ce plugin permet de scanner le réseau à la recherche de caméras compatibles avec le protocole universel ONVIF, puis de créer les équipements correspondant ainsi que les commandes PTZ associées.
