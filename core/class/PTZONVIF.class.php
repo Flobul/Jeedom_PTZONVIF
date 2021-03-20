@@ -32,33 +32,37 @@ class PTZONVIF extends eqLogic {
   /************* Static methods ************/
   	public static function dependancy_info() {
       
-      	log::add('PTZONVIF', 'debug', '--- DEPENDANCY INFO ---');
+      	//log::add('PTZONVIF_dep', 'warning', '--- DEPENDANCY INFO ---');
       
       	$return = array(); 
       
-		$return['log'] = 'getAccessToken'; 
-		$return['progress_file'] = '/tmp/PTZONVIF_dependancy'; 
+		$return['log'] = 'PTZONVIF_dep'; 
+		$node_onvif = realpath(dirname(__FILE__) . '/../../ressources/node_modules/node-onvif');
+		$return['progress_file'] = '/tmp/PTZONVIF_dep'; 
+     	
+		if (is_dir($node_onvif)) {
+		  $return['state'] = 'ok';
+		} else {
+		  $return['state'] = 'nok';
+		}
+
       
-      	system( "sudo /bin/bash ".dirname(__FILE__) . "/../../ressources/info.sh 2>/dev/null 1>&2",$code);
-        
-      	$return['state'] = ($code==0) ? 'ok' : 'nok'; 
-        
 		return $return; 
   	
     }
 
   	public static function dependancy_install() {
     
-      	log::add('PTZONVIF', 'debug', '--- DEPENDANCY INSTALL ---');
+      	log::add('PTZONVIF', 'info', '--- DEPENDANCY INSTALL ---');
       
-      	if (file_exists('/tmp/PTZONVIF_dependancy')) { 
+      	if (file_exists('/tmp/PTZONVIF_dep')) { 
 			return; 
 		} 
       
-		log::remove('getAccessToken'); 
+		log::remove('PTZONVIF_dep'); 
       
 		$cmd = 'sudo /bin/bash ' . dirname(__FILE__) . '/../../ressources/install.sh'; 
-		$cmd .= ' >> ' . log::getPathToLog('getAccessToken') . ' 2>&1 &'; 
+		$cmd .= ' >> ' . log::getPathToLog('PTZONVIF_dep') . ' 2>&1 &'; 
       
 		exec($cmd); 
       
@@ -399,7 +403,8 @@ class PTZONVIF extends eqLogic {
 			$PTZONVIF->setName($_name . ' ' . $logical_id);
 			$PTZONVIF->setConfiguration('adresseip', $_Ip);
 			$PTZONVIF->setConfiguration('port', $_port);
-			$PTZONVIF->setConfiguration('URL', $_url);			
+			$PTZONVIF->setConfiguration('URL', $_url);	
+			$PTZONVIF->setConfiguration('vitPTZ', "500");			
 		}
 		else {
 			log::add('PTZONVIF', 'debug', 'Déjà connu  : '.$_Ip);
@@ -469,6 +474,7 @@ class PTZONVIFCmd extends cmd  {
 		$xaddrs=$eqLogic->getConfiguration('URL');
 		$username=$eqLogic->getConfiguration('username');
 		$password=$eqLogic->getConfiguration('password');
+		$vitPTZ=$eqLogic->getConfiguration('vitPTZ');
 		//
 		if ($this->getConfiguration('action') == 'preset') {
 			$preset = $this->getConfiguration('api') ;
@@ -541,22 +547,22 @@ class PTZONVIFCmd extends cmd  {
 			switch($this->getConfiguration('api'))
 			{
 				case 'up':
-					$commande .= " 0 1 0";
+					$commande .= " 0 1 0 ".$vitPTZ;
 					break;
 				case 'down':
-					$commande .= " 0 -1 0";
+					$commande .= " 0 -1 0 ".$vitPTZ;
 					break;
 				case 'left':
-					$commande .= " -1 0 0";
+					$commande .= " -1 0 0 ".$vitPTZ;
 					break;
 				case 'right':
-					$commande .= " 1 0 0";
+					$commande .= " 1 0 0 ".$vitPTZ;
 					break;
 				case 'ZoomIn':
-					$commande .= " 0 0 1";
+					$commande .= " 0 0 1 ".$vitPTZ;
 					break;
 				case 'ZoomOut':
-					$commande .= " 0 0 -1";
+					$commande .= " 0 0 -1 ".$vitPTZ;
 					break;
 
 			}		
