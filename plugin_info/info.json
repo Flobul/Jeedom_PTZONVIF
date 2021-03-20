@@ -11,8 +11,8 @@
 		"forum":"https://community.jeedom.com/t/presentation-plugin-ptzonvif-pilotage-des-cameras-onvif/"
 	},
   "maxDependancyInstallTime": 0,
-  "documentation": "https://github.com/freddye83/Jeedom_PTZONVIF",
-  "changelog": "https://www.perdu.com",
+  "documentation": "https://freddye83.github.io/Jeedom_PTZONVIF",
+  "changelog": "https://freddye83.github.io/Jeedom_PTZONVIF/fr_FR/changelog",
   
   "author": "Freddye83",
   "compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"]
