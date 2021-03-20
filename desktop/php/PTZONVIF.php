@@ -67,7 +67,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 		<div class="input-group pull-right" style="display:inline-flex;">
 			<span class="input-group-btn">
 				<!-- Les balises <a></a> sont volontairement fermées à la ligne suivante pour éviter les espaces entre les boutons. Ne pas modifier -->
-				<a class="btn btn-sm btn-warning eqLogicAction syncinfo roundedLeft" id="btn_sync"><i class="fas fa-spinner" title="{{Découverte}}"></i> {{Découverte}}</a>
+				<a class="btn btn-sm btn-warning eqLogicAction syncinfo roundedLeft" id="btn_sync"><i class="fas fa-spinner" title="{{Découverte}}"></i> {{Analyse}}</a>
 				<a class="btn btn-sm btn-default eqLogicAction" data-action="configure"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Configuration avancée}}</span>
 				</a><a class="btn btn-sm btn-default eqLogicAction" data-action="copy"><i class="fas fa-copy"></i><span class="hidden-xs">  {{Dupliquer}}</span>
 				</a><a class="btn btn-sm btn-success eqLogicAction" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}
@@ -168,6 +168,12 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             </div>
                         </div>
 						<div class="form-group">
+                            <label class="col-lg-2 control-label">{{Vitesse PTZ}}</label>
+                            <div class="col-lg-3">
+                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitPTZ"/>
+                            </div>
+                        </div>
+						<div class="form-group">
                             <label class="col-lg-2 control-label">{{URL}}</label>
                             <div class="col-lg-9">
                                 <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="URL"/>
@@ -185,36 +191,6 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="snapshot"/>
                             </div>
                         </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{Manufacturer}}</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Manufacturer"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{Model}}</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Model"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{FirmwareVersion}}</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="FirmwareVersion"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{SerialNumber}}</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="SerialNumber"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{HardwareId}}</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="HardwareId"/>
-                            </div>
-                        </div>
                         </fieldset>
                     </form>
                 
@@ -223,6 +199,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							<fieldset>
 								<legend>{{Informations}}</legend>
 								<div class="form-group">
+									<div class="alert alert-info">
+										{{Prérequis : }}</div>
 									<div id="div_instruction"></div>
 								</div> 	
 							</fieldset>					
