@@ -6,23 +6,24 @@ fi
   
 cd ../../plugins/PTZONVIF/ressources
   
-touch /tmp/dependancy_PTZONVIF_in_progress
+touch /tmp/PTZONVIF_dep
 echo ************************************
 echo *   INSTALLATION DES DEPENDANCES   *
 echo ************************************
-echo 0 > /tmp/dependancy_PTZONVIF_in_progress
-sudo npm install node-onvif 
+echo 0 > /tmp/PTZONVIF_dep
 
-echo 25 > /tmp/dependancy_PTZONVIF_in_progress
 
+echo 25 > /tmp/PTZONVIF_dep
+echo "NodeJS version :"
+sudo node -v
 echo "Launch install of Onvif dependancy"
-echo 50 > /tmp/dependancy_PTZONVIF_in_progress
-sudo npm install minimist
-echo 75 > /tmp/dependancy_PTZONVIF_in_progress
-sudo npm install onvif 
-echo 100 > /tmp/dependancy_PTZONVIF_in_progress
+echo 50 > /tmp/PTZONVIF_dep
+sudo npm install node-onvif 
+echo 75 > /tmp/PTZONVIF_dep
+
+echo 100 > /tmp/PTZONVIF_dep
 echo "Everything is successfully installed!"
-rm /tmp/dependancy_PTZONVIF_in_progress
+rm /tmp/PTZONVIF_dep
 
 
 echo "Fin d'nstallation des dependances"

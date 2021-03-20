@@ -10,6 +10,7 @@ let device = new onvif.OnvifDevice({
   xaddr: myArgs[0],
   user : myArgs[1],
   pass : myArgs[2]
+  
 });
 
 let params = {
@@ -29,7 +30,7 @@ let params = {
 				{
 					console.error(error);
                 });
-                }, 100);
+                }, parseInt(myArgs[6]));
         });
         }).then(() => { }).catch((error) => {
 			console.error(error);
