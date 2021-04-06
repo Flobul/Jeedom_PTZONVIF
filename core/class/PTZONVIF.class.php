@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__).'/../../../../core/php/core.inc.php';
+require_once dirname(__FILE__).'/../../3rdparty/class.ponvif.php';
 
 class PTZONVIF extends eqLogic {
 
@@ -29,42 +30,17 @@ class PTZONVIF extends eqLogic {
     private $_PanTiltSpeedMin;
     private $_PanTiltSpeedMax;
     private $_nombrecamera;
+
   /************* Static methods ************/
   	public static function dependancy_info() {
       
-      	//log::add('PTZONVIF_dep', 'warning', '--- DEPENDANCY INFO ---');
-      
-      	$return = array(); 
-      
-		$return['log'] = 'PTZONVIF_dep'; 
-		$node_onvif = realpath(dirname(__FILE__) . '/../../ressources/node_modules/node-onvif');
-		$return['progress_file'] = '/tmp/PTZONVIF_dep'; 
-     	
-		if (is_dir($node_onvif)) {
-		  $return['state'] = 'ok';
-		} else {
-		  $return['state'] = 'nok';
-		}
 
-      
-		return $return; 
   	
     }
 
   	public static function dependancy_install() {
     
-      	log::add('PTZONVIF', 'info', '--- DEPENDANCY INSTALL ---');
-      
-      	if (file_exists('/tmp/PTZONVIF_dep')) { 
-			return; 
-		} 
-      
-		log::remove('PTZONVIF_dep'); 
-      
-		$cmd = 'sudo /bin/bash ' . dirname(__FILE__) . '/../../ressources/install.sh'; 
-		$cmd .= ' >> ' . log::getPathToLog('PTZONVIF_dep') . ' 2>&1 &'; 
-      
-		exec($cmd); 
+ 
       
   	}
   
@@ -90,6 +66,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','move');
 			$cmd->setConfiguration('api','up');
+			$cmd->setOrder(2);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'Bas');
@@ -105,6 +82,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','move');
 			$cmd->setConfiguration('api','down');
+			$cmd->setOrder(3);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'Gauche');
@@ -120,6 +98,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','move');
 			$cmd->setConfiguration('api','left');
+			$cmd->setOrder(0);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'Droite');
@@ -135,6 +114,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','move');
 			$cmd->setConfiguration('api','right');
+			$cmd->setOrder(1);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'ZoomIn');
@@ -150,6 +130,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','move');
 			$cmd->setConfiguration('api','ZoomIn');
+			$cmd->setOrder(4);
             $cmd->save();
         }
 				$getDataCmd = $this->getCmd(null, 'ZoomOut');
@@ -165,6 +146,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','move');
 			$cmd->setConfiguration('api','ZoomOut');
+			$cmd->setOrder(5);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'P0');
@@ -179,6 +161,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','preset');
 			$cmd->setConfiguration('api','P0');
+			$cmd->setOrder(6);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'P1');
@@ -193,6 +176,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','preset');
 			$cmd->setConfiguration('api','P1');
+			$cmd->setOrder(7);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'P2');
@@ -207,6 +191,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','preset');
 			$cmd->setConfiguration('api','P2');
+			$cmd->setOrder(8);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'P3');
@@ -221,6 +206,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','preset');
 			$cmd->setConfiguration('api','P3');
+			$cmd->setOrder(9);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'P4');
@@ -235,6 +221,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','preset');
 			$cmd->setConfiguration('api','P4');
+			$cmd->setOrder(10);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'P5');
@@ -249,6 +236,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','preset');
 			$cmd->setConfiguration('api','P5');
+			$cmd->setOrder(11);
             $cmd->save();
         }
 				$getDataCmd = $this->getCmd(null, 'S0');
@@ -263,6 +251,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','setpreset');
 			$cmd->setConfiguration('api','S0');
+			$cmd->setOrder(12);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'S1');
@@ -277,6 +266,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','setpreset');
 			$cmd->setConfiguration('api','S1');
+			$cmd->setOrder(13);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'S2');
@@ -291,6 +281,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','setpreset');
 			$cmd->setConfiguration('api','S2');
+			$cmd->setOrder(14);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'S3');
@@ -305,6 +296,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','setpreset');
 			$cmd->setConfiguration('api','S3');
+			$cmd->setOrder(15);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'S4');
@@ -319,6 +311,7 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','setpreset');
 			$cmd->setConfiguration('api','S4');
+			$cmd->setOrder(16);
             $cmd->save();
         }
 		$getDataCmd = $this->getCmd(null, 'S5');
@@ -333,6 +326,22 @@ class PTZONVIF extends eqLogic {
             $cmd->setIsVisible(1);
 			$cmd->setConfiguration('action','setpreset');
 			$cmd->setConfiguration('api','S5');
+			$cmd->setOrder(17);
+            $cmd->save();
+        }
+		$getDataCmd = $this->getCmd(null, 'Reboot');
+        if (!is_object($getDataCmd))
+        {
+            $cmd = new PTZONVIFCmd();
+            $cmd->setName('Reboot');
+            $cmd->setLogicalId('Reboot');
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->setType('action');
+            $cmd->setSubType('other');
+            $cmd->setIsVisible(1);
+			$cmd->setConfiguration('action','system');
+			$cmd->setConfiguration('api','reboot');
+			$cmd->setOrder(99);
             $cmd->save();
         }
 
@@ -390,7 +399,7 @@ class PTZONVIF extends eqLogic {
        
     }
 	
-	public static function creation($_id, $_name, $_Ip, $_port, $_url) {
+	public static function creation($_id, $_name, $_Ip, $_port, $_url, $idCam) {
 		$logical_id = str_replace("urn:uuid:","",$_id);
 		log::add('PTZONVIF', 'debug', 'Création : '.$_Ip);
 		$PTZONVIF=PTZONVIF::byLogicalId($logical_id, 'PTZONVIF');
@@ -404,9 +413,22 @@ class PTZONVIF extends eqLogic {
 			$PTZONVIF->setConfiguration('adresseip', $_Ip);
 			$PTZONVIF->setConfiguration('port', $_port);
 			$PTZONVIF->setConfiguration('URL', $_url);	
-			$PTZONVIF->setConfiguration('vitX', "500");	
-			$PTZONVIF->setConfiguration('vitY', "500");
-			$PTZONVIF->setConfiguration('vitZ', "500");			
+			$PTZONVIF->setConfiguration('vitX', "0.1");	
+			$PTZONVIF->setConfiguration('vitY', "0.1");
+			$PTZONVIF->setConfiguration('vitZ', "0.1");	
+			$PTZONVIF->setConfiguration('timeX', "500");	
+			$PTZONVIF->setConfiguration('timeY', "500");	
+			$PTZONVIF->setConfiguration('timeZ', "500");
+			
+			if ($idCam!=0){
+				$PTZONVIF->setConfiguration('idCam', $idCam);
+				$eqcam=eqLogic::byId($idCam);
+				$objId=$eqcam->getObject_Id();
+				$PTZONVIF->setObject_id($objId);
+				$PTZONVIF->setConfiguration('username', $eqcam->getConfiguration('username'));
+				$PTZONVIF->setConfiguration('password', $eqcam->getConfiguration('password'));
+			}
+			$PTZONVIF->save();
 		}
 		else {
 			log::add('PTZONVIF', 'debug', 'Déjà connu  : '.$_Ip);
@@ -469,32 +491,37 @@ class PTZONVIFCmd extends cmd  {
     public function execute($_options = array())
 
     {
-		log::add('PTZONVIF', 'debug', 'execute');
-		log::add('PTZONVIF', 'debug', $this->getEqlogic_id());
 		log::add('PTZONVIF', 'debug', $this->getName());
 		$eqLogic = $this->getEqLogic();
 		$xaddrs=$eqLogic->getConfiguration('URL');
+		$token=$eqLogic->getConfiguration('token');
+		$IPAddr=$eqLogic->getConfiguration('adresseip');
 		$username=$eqLogic->getConfiguration('username');
 		$password=$eqLogic->getConfiguration('password');
 		$vitX=$eqLogic->getConfiguration('vitX');
 		$vitY=$eqLogic->getConfiguration('vitY');
 		$vitZ=$eqLogic->getConfiguration('vitZ');
+		$timeX=$eqLogic->getConfiguration('timeX')*1000;
+		$timeY=$eqLogic->getConfiguration('timeY')*1000;
+		$timeZ=$eqLogic->getConfiguration('timeZ')*1000;
+		log::add('PTZONVIF', 'debug', strval ($vitX).' '.strval ($vitY).' '.strval ($vitZ));
+		$onvif = new Ponvif2();
+		$onvif->setUsername($username);
+		$onvif->setPassword($password);
+		$onvif->setIPAddress($IPAddr);
+		$onvif->setMediaUri($xaddrs);
+		$onvif->setPTZUri($eqLogic->getConfiguration('ptzuri'));
+		log::add('PTZONVIF','debug','URI : '.$onvif->getPTZUri());
+		
 		//
+		if ($this->getConfiguration('action') == 'system') {
+			$preset = $this->getConfiguration('reboot') ;
+			$onvif->core_SystemReboot();
+			return 1;
+		}
 		if ($this->getConfiguration('action') == 'preset') {
 			$preset = $this->getConfiguration('api') ;
-            log::add('PTZONVIF', 'debug',$preset);
-			$commande = "node /var/www/html/plugins/PTZONVIF/ressources/GoPreset.js ";
-			$commande .= $xaddrs;  
-			$commande .= " ";
-			$commande .= $username;  
-			$commande .= " ";
-			$commande .= $password; 
-			$commande .= " ";
-			$commande .= $preset;			
-			$commande .= " 2>&1";
-			$goPreset = shell_exec($commande);
-			log::add('PTZONVIF','debug','GoPreset.js : '.$commande);
-			log::add('PTZONVIF','debug','GoPreset.js : '.$goPreset);
+			$onvif->ptz_GotoPreset($token,$preset,1,1,1);
 			return 1;
 		}
 		if ($this->getConfiguration('action') == 'setpreset') {
@@ -521,59 +548,63 @@ class PTZONVIFCmd extends cmd  {
 					break;
 			
 			}
-			$preset = $cmd2->getConfiguration('api') ;
-			//$cmd2->setConfiguration('api',$preset);
-			//$cmd2->save();
-            log::add('PTZONVIF', 'debug',$preset);
-			$commande = "node /var/www/html/plugins/PTZONVIF/ressources/SetPreset.js ";
-			$commande .= $xaddrs;  
-			$commande .= " ";
-			$commande .= $username;  
-			$commande .= " ";
-			$commande .= $password; 
-			$commande .= " ";
-			$commande .= $preset;			
-			$commande .= " 2>&1";
-			$setPreset = shell_exec($commande);
-			log::add('PTZONVIF','debug','setPreset.js : '.$commande);
-			log::add('PTZONVIF','debug','setPreset.js : '.$setPreset);
+			$PresetToken = $cmd2->getConfiguration('api') ;
+			$PresetName = $cmd2->getConfiguration('presetName') ;
+			if (is_null($PresetToken) || $PresetToken=='') {
+				$PresetToken=$cmd2->getLogicalId(); //P0 P1 P2...
+				$PresetName = $PresetToken;
+				$cmd2->setConfiguration('presetName',$PresetToken);
+				$cmd2->setConfiguration('api',$PresetToken);
+				}
+			try {$onvif->ptz_RemovePreset($token,$PresetToken);	} catch(Exception $e){	}
+			$PresetTokenSet=$onvif->ptz_SetPreset($token,$PresetName);
+			if (is_array($PresetTokenSet)) { $PresetTokenSet=$PresetName;}
+			$cmd2->setConfiguration('api',$PresetTokenSet);
+			$cmd2->setIsVisible(true);
+			$cmd2->save();
+			log::add('PTZONVIF','debug','preset token : '.json_encode($PresetTokenSet));
+			log::add('PTZONVIF','debug','preset name : '.$cmd2->getConfiguration('presetName') );
 			return 1;
 		}
 		if ($this->getConfiguration('action') == 'move') {
-			$preset = $this->getConfiguration('api') ;
-            log::add('PTZONVIF', 'debug',$preset);
-			$commande = "node /var/www/html/plugins/PTZONVIF/ressources/Move.js ";
-			$commande .= $xaddrs;  
-			$commande .= " ";
-			$commande .= $username;  
-			$commande .= " ";
-			$commande .= $password; 
-			switch($this->getConfiguration('api'))
+			$api = $this->getConfiguration('api') ;
+            log::add('PTZONVIF', 'debug',$api);
+			switch($api)
 			{
 				case 'up':
-					$commande .= " 0 1 0 ".$vitX;
+					$onvif->ptz_ContinuousMove($token,0,$vitY);
+					usleep($timeY);
+					$onvif->ptz_Stop($token,'true','true');
 					break;
 				case 'down':
-					$commande .= " 0 -1 0 ".$vitX;
+					$onvif->ptz_ContinuousMove($token,0,-$vitY);
+					//$onvif->ptz_RelativeMove($token,0,1,1,1);
+					usleep($timeY);
+					$onvif->ptz_Stop($token,'true','true');
 					break;
 				case 'left':
-					$commande .= " -1 0 0 ".$vitY;
+					$onvif->ptz_ContinuousMove($token,-$vitX,0);
+					usleep($timeX);
+					$onvif->ptz_Stop($token,'true','true');
 					break;
 				case 'right':
-					$commande .= " 1 0 0 ".$vitY;
+					$onvif->ptz_ContinuousMove($token,$vitX,0);
+					usleep($timeX);
+					$onvif->ptz_Stop($token,'true','true');
 					break;
-				case 'ZoomIn':
-					$commande .= " 0 0 1 ".$vitZ;
+				case 'ZoomIn': 
+					$onvif->ptz_ContinuousMoveZoom($token,$vitZ);
+					usleep($timeZ);
+					$onvif->ptz_Stop($token,'true','true');
 					break;
 				case 'ZoomOut':
-					$commande .= " 0 0 -1 ".$vitZ;
+					$onvif->ptz_ContinuousMoveZoom($token,-$vitZ);
+					usleep($timeZ);
+					$onvif->ptz_Stop($token,'true','true');
 					break;
 
 			}		
-			$commande .= " 2>&1";
-			$goPreset = shell_exec($commande);
-			log::add('PTZONVIF','debug','Move.js : '.$commande);
-			log::add('PTZONVIF','debug','Move.js : '.$goPreset);
+			
 			return 1;
 		}
 		

@@ -25,7 +25,7 @@ try {
     }
     
     if (init('action') == 'creation') {
-		PTZONVIF::creation(init('id'),init('name'),init('host'),init('port'),init('url'));
+		PTZONVIF::creation(init('id'),init('name'),init('host'),init('port'),init('url'),init('idCam'));
 		ajax::success();
 	}
 
