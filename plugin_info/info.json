@@ -5,7 +5,7 @@
   "require": "4.0",
   "version": "1.0",
   "category": "security",
-  "hasDependency": true,
+  "hasDependency": false,
   "hasOwnDaemon": false,
   "link" : {
 		"forum":"https://community.jeedom.com/t/presentation-plugin-ptzonvif-pilotage-des-cameras-onvif/"

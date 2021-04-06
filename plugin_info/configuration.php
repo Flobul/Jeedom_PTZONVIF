@@ -12,10 +12,10 @@ if (!isConnect('admin')) {
   <fieldset>
     <div class="form-group">
       <label class="col-sm-3 control-label">
-        {{test}}
+        {{Timeout découverte (sec)}}
       </label>
-      <div class="col-sm-9">
-        <input class="configKey form-control" data-l1key="" />
+      <div class="col-sm-1">
+        <input class="configKey form-control" data-l1key="timeout"  placeholder="3"/>
       </div>
     </div>
   </fieldset>
