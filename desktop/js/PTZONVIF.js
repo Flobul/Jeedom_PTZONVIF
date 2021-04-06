@@ -18,7 +18,7 @@
 /*
 * Permet la réorganisation des commandes dans l'équipement
 */
-//$("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
+$("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
 
 /*
 * Bandeau d'information
@@ -32,13 +32,33 @@ $('.eqLogicAttr[data-l1key=configuration][data-l2key=adresseip]').on('change', f
 
 	
 	var ip = $('.eqLogicAttr[data-l1key=configuration][data-l2key=adresseip]').value();
-	console.log(" IP:"+ip);
+	//console.log(" IP:"+ip);
 	if(ip == '' || ip == null){
 	//  console.log(" export eqlogic is:"+idcmd);
 
 			var instruction = "Assurezvous de bien renseigner l'adresse IP, le user, et le password, puis cliquer sur découverte afin de renseigner automatiquement les différents champs";
 			
 	} 
+	$('#div_instruction').empty();
+		if(instruction != '' && instruction != undefined){
+		   $('#div_instruction').html('<div class="alert alert-info">'+instruction+'</div>');
+		}
+});
+
+$('.eqLogicAttr[data-l1key=configuration][data-l2key=adresseip]').on('change', function () {
+	//var PTZONVIFId = $('#idPTZONVIF').value();
+
+	var ip = $('.eqLogicAttr[data-l1key=configuration][data-l2key=adresseip]').value();
+	var token = $('.eqLogicAttr[data-l1key=configuration][data-l2key=token]').value();
+	//console.log(" IP:"+ip);
+	if(ip != '' && ip != null){
+		if(token == '' || token == null){
+		//  console.log(" export eqlogic is:"+idcmd);
+
+				var instruction = "Appuyer sur le bouton anlayse afin de compléter les champs manquant";
+				
+		} 
+	}
 	$('#div_instruction').empty();
 		if(instruction != '' && instruction != undefined){
 		   $('#div_instruction').html('<div class="alert alert-info">'+instruction+'</div>');
@@ -58,19 +78,8 @@ $('#bt_discover').off('click').on('click', function () {
     $('#md_modal').load('index.php?v=d&plugin=PTZONVIF&modal=discover_all').dialog('open');
 	
 });
-$('#bt_goCarte').on('click', function () {
-	//var PTZONVIFId = $('#idPTZONVIF').value();
 
-  idcmd = $('.eqLogicAttr[data-l1key=id]')[0].value;
-  if(idcmd != '' && idcmd != null){
-	//  console.log(" export eqlogic is:"+idcmd);
-		$('#md_modal').dialog({title: "{{Découverte}}"});
-		$('#md_modal').load('index.php?v=d&plugin=PTZONVIF&modal=discover&id='+ idcmd).dialog('open');
-		//location.reload();
-  }
-  
-  
-});
+
 
 $('#btn_sync').on('click', function () {
 	//var PTZONVIFId = $('#idPTZONVIF').value();
@@ -88,21 +97,9 @@ $('#btn_sync').on('click', function () {
 				console.log("fermée"); 
 			
 			},
-			/*
-			buttons: [{
-				text: "Enregistrer",
-				
-				click: function() {
-					$( this ).dialog( "close" );
-				}
-			}]*/
+
 		});
-		/*$('#btSaveDiscov').click(function() {
-			$('#md_modal').modal('hide')
-		});
-		var buttons = $('.ui-dialog-buttonset').children('button');
-		buttons.css("color","green!improtant");
-		//location.reload();*/
+
 		
 		
   }

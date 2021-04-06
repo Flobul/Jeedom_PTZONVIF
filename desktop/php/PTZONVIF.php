@@ -32,6 +32,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                 <br>
                 <span>{{Découverte}}</span>
             </div>
+
 			<div class="cursor pluginAction logoSecondary" data-action="openLocation" data-location="<?=$plugin->getDocumentation()?>">
                 <i class="fas fa-book"></i>
                 <br>
@@ -82,162 +83,239 @@ $eqLogics = eqLogic::byType($plugin->getId());
 			<li role="presentation"><a href="#commandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
 		</ul>
 	 <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
-                <div role="tabpanel" class="tab-pane active" id="eqlogictab">
-                    <br/>
-					<div class="row">
-						<div class="col-sm-7">
-						
-							<form class="form-horizontal">
-								<fieldset>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" for="name">{{Nom de l'équipement
-                                    ONVIF}}</label>
-                                <div class="col-sm-3">
-                                    <input type="text" class="eqLogicAttr form-control" data-l1key="id"
-                                           style="display : none;"/>
-                                    <input type="text" class="eqLogicAttr form-control" data-l1key="name" id="name"
-                                           placeholder="{{Nom de l'équipement ONVIF}}"/>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" for="sel_object">{{Objet parent}}</label>
-                                <div class="col-sm-3">
-                                    <select id="sel_object" class="eqLogicAttr form-control" data-l1key="object_id">
-                                        <option value="">{{Aucun}}</option>
-                                        <?php
-                                        foreach (jeeObject::all() as $object) {
-                                            echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{Catégorie}}</label>
-                                <div class="col-sm-9">
-                                    <?php
-                                    foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
-                                        echo '<label class="checkbox-inline" for="category-' . $key . '">';
-                                        echo '<input type="checkbox" id="category-' . $key . '" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" />' . $value['name'];
-                                        echo '</label>';
-                                    }
-                                    ?>
-                                </div>
-                            </div>
-                        <div class="form-group">
-                          <label class="col-sm-2 control-label" ></label>
-                            <div class="col-sm-10">
-                            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-label-text="{{Activer}}" data-l1key="isEnable" checked/>Activer</label>
-                            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-label-text="{{Visible}}" data-l1key="isVisible" checked/>Visible</label>
-                            </div>
-                            
-                        </div>
+		<div role="tabpanel" class="tab-pane active" id="eqlogictab">
+			<br/>
+			<div class="row">
+				<div class="col-sm-7">
+				
+					<form class="form-horizontal">
+						<fieldset>
 						<div class="form-group">
-                            <label class="col-lg-2 control-label"></label>
-                            
-                        </div>
-                        <div class="form-group">
-                            <label class="col-lg-2 control-label">{{IP de la Camera}}</label>
-                            <div class="col-lg-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="adresseip"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-lg-2 control-label">{{Port}}</label>
-                            <div class="col-lg-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="port"/>
-                            </div>
-                        </div>
-                                      
-                        <div class="form-group">
-                            <label class="col-lg-2 control-label">{{Utilisateur}}</label>
-                            <div class="col-lg-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="username"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-lg-2 control-label">{{Mot de passe}}</label>
-                            <div class="col-lg-3">
-                                <input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{token}}</label>
-                            <div class="col-lg-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="token"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{Vitesse X}}</label>
-                            <div class="col-lg-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitX"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{Vitesse Y}}</label>
-                            <div class="col-lg-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitY"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{Vitesse Z}}</label>
-                            <div class="col-lg-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitZ"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{URL}}</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="URL"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{rtsp}}</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="rtsp"/>
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label class="col-lg-2 control-label">{{snapshot}}</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="snapshot"/>
-                            </div>
-                        </div>
-                        </fieldset>
-                    </form>
-                
-						</div>  
-						<div id="infoNode" class="col-sm-4">
-							<fieldset>
-								<legend>{{Informations}}</legend>
-								<div class="form-group">
-									<div class="alert alert-info">
-										{{Prérequis : }}</div>
-									<div id="div_instruction"></div>
-								</div> 	
-							</fieldset>					
+							<label class="col-sm-3 control-label" for="name">{{Nom de l'équipement
+								ONVIF}}</label>
+							<div class="col-sm-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="id"
+									   style="display : none;"/>
+								<input type="text" class="eqLogicAttr form-control" data-l1key="name" id="name"
+									   placeholder="{{Nom de l'équipement ONVIF}}"/>
+							</div>
 						</div>
-					</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label" for="sel_object">{{Objet parent}}</label>
+							<div class="col-sm-3">
+								<select id="sel_object" class="eqLogicAttr form-control" data-l1key="object_id">
+									<option value="">{{Aucun}}</option>
+									<?php
+									foreach (jeeObject::all() as $object) {
+										echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
+									}
+									?>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">{{Catégorie}}</label>
+							<div class="col-sm-9">
+								<?php
+								foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
+									echo '<label class="checkbox-inline" for="category-' . $key . '">';
+									echo '<input type="checkbox" id="category-' . $key . '" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" />' . $value['name'];
+									echo '</label>';
+								}
+								?>
+							</div>
+						</div>
+						<div class="form-group">
+						  <label class="col-sm-2 control-label" ></label>
+							<div class="col-sm-10">
+							<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-label-text="{{Activer}}" data-l1key="isEnable" checked/>Activer</label>
+							<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-label-text="{{Visible}}" data-l1key="isVisible" checked/>Visible</label>
+							</div>
+							
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label"></label>
+							
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{IP de la Camera}}</label>
+							<div class="col-lg-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="adresseip"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{Port}}</label>
+							<div class="col-lg-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="port"/>
+							</div>
+						</div>
+									  
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{Utilisateur}}</label>
+							<div class="col-lg-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="username"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{Mot de passe}}</label>
+							<div class="col-lg-3">
+								<input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{token}}</label>
+							<div class="col-lg-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="token"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{Vitesse X}} <sup><i class="fas fa-question-circle tooltips" title="{{Vitesse de déplacement X (pan) comprise entre 0 et 1}}"></i></sup></label>
+							<div class="col-lg-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitX"/>
+							</div>
+							<label class="col-lg-2 control-label">{{Delais X}} <sup><i class="fas fa-question-circle tooltips" title="{{Délais avant stop X (pan) comprise entre 0 et 5000(ms)}}"></i></sup></label>
+							<div class="col-lg-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="timeX"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{Vitesse Y}} <sup><i class="fas fa-question-circle tooltips" title="{{Vitesse de déplacement Y (tilt) comprise entre 0 et 1}}"></i></sup></label>
+							<div class="col-lg-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitY"/>
+							</div>
+							<label class="col-lg-2 control-label">{{Delais Y}} <sup><i class="fas fa-question-circle tooltips" title="{{Délais avant stop Y (tilt) comprise entre 0 et 5000(ms)}}"></i></sup></label>
+							<div class="col-lg-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="timeY"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{Vitesse Z}} <sup><i class="fas fa-question-circle tooltips" title="{{Vitesse de déplacement Z (zoom) comprise entre 0 et 1}}"></i></sup></label>
+							<div class="col-lg-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vitZ"/>
+							</div>
+							<label class="col-lg-2 control-label">{{Delais Z}} <sup><i class="fas fa-question-circle tooltips" title="{{Délais avant stop Z (zoom) comprise entre 0 et 5000(ms)}}"></i></sup></label>
+							<div class="col-lg-3">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="timeZ"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{Media URI}}</label>
+							<div class="col-lg-9">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="URL"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{PTZ URI}}</label>
+							<div class="col-lg-9">
+								<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ptzuri"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{rtsp}}</label>
+							<div class="col-lg-9">
+								<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="rtsp"></span>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">{{snapshot}}</label>
+							<div class="col-lg-9">
+								<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="snapshot"></span>
+								
+							</div>
+						</div>
+						</fieldset>
+					</form>
+
+		
+				</div> 
+				
+				
+				
+				
+				
+				<div id="infoNode" class="col-sm-4">
+					<form class="form-horizontal">
+					<fieldset>
+						<legend>{{Informations}}</legend>
+
+					
+					    <div class="form-group">
+							<label class="col-sm-3 control-label">{{Manufacturer}}</label>
+							<div class="col-sm-3">
+								<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="Manufacturer" id="Manufacturer"></span>
+							</div>
+							<label class="col-sm-3 control-label">{{Model}}</label>
+							<div class="col-sm-3">
+								<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="Model" id="Model"></span>
+							</div>
+					    </div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">{{Name}}</label>
+							<div class="col-sm-3">
+								<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="Name" id="Name"></span>
+							</div>
+							<label class="col-sm-3 control-label">{{SerialNumber}}</label>
+							<div class="col-sm-3">
+								<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="SerialNumber" id="SerialNumber"></span>
+							</div>
+					    </div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">{{FirmwareVersion}}</label>
+							<div class="col-sm-3">
+								<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="FirmwareVersion" id="FirmwareVersion"></span>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">{{HardwareId}}</label>
+							<div class="col-sm-3">
+								<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="HardwareId" id="HardwareId"></span>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">{{Version ONVIF}}</label>
+							<div class="col-sm-3">
+								<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="Version" id="Version"></span>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">{{URN}}</label>
+							<div class="col-sm-3">
+								<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="URN" id="URN"></span>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="alert alert-info">{{Prérequis : }}</div>
+							<div id="div_instruction"></div>
+						</div>
+
+					    
+					
+						
+						 	
+					</fieldset>
+					</form>	
 				</div>
-				<div role="tabpanel" class="tab-pane" id="commandtab">
-                    <a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;">
-                        <i class="fa fa-plus-circle"></i> {{Commandes}}
-                    </a>
-                    <br/>
-                    <br/>
-                    <table id="table_cmd" class="table table-bordered table-condensed">
-                        <thead>
-                        <tr>
-                            <th>{{Nom}}</th>
-                            <th>{{Type}}</th>
-                            <th>{{Action}}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+			</div>
+		</div>
+		<div role="tabpanel" class="tab-pane" id="commandtab">
+			<a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;">
+				<i class="fa fa-plus-circle"></i> {{Commandes}}
+			</a>
+			<br/>
+			<br/>
+			<table id="table_cmd" class="table table-bordered table-condensed">
+				<thead>
+				<tr>
+					<th>{{Nom}}</th>
+					<th>{{Type}}</th>
+					<th>{{Action}}</th>
+				</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
 
 	</div><!-- /.eqLogic -->
 </div><!-- /.row row-overflow -->

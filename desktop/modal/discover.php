@@ -14,11 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
-
+require_once dirname(__FILE__).'/../../3rdparty/class.ponvif.php';
+//require_once __DIR__ . '/../../vendor/autoload.php';
 if (!isConnect('admin')) {
     throw new Exception('{{401 - Accès non autorisé}}');
 }
-
+if (init('id') == '') {
+    throw new Exception('{{L\'id de l\'opération ne peut etre vide : }}' . init('id'));
+}
+//use Onvif\Onvif;
 ?>
 
 
@@ -28,12 +32,11 @@ if (!isConnect('admin')) {
 
 <table class="table table-condensed" >
 	<thead>
-		<tr style="background-color: grey !important; color: white !important;">
+		<tr style="background-color: #5078aa !important; color: white !important;">
 			<th>{{IP}}</th>
 			<th>{{Port}}</th>
 			<th>{{URN}}</th>
-			<th>{{Name}}</th>
-			<th>{{Location}}</th>
+			
 		</tr>
 	</thead>
 	<tbody>
@@ -42,29 +45,18 @@ if (!isConnect('admin')) {
 
 
 <?php
-/* This file is part of Jeedom.
- *
- * Jeedom is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Jeedom is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
- */
 
-if (!isConnect('admin')) {
-    throw new Exception('{{401 - Accès non autorisé}}');
+function json_export($name,$txt) {
+	$outpout=json_encode($txt);
+	log::add('PTZONVIF','debug',$name.' : '.$outpout);
+	$file=(__DIR__).'/../../ressources/'.$name;
+    $handle = fopen($file, "w");
+    fwrite($handle, $outpout);
+    fclose($handle);
 }
 
-if (init('id') == '') {
-    throw new Exception('{{L\'id de l\'opération ne peut etre vide : }}' . init('id'));
-}
+
+
 $ideq = init('id');
 $eq = eqLogic::byId($ideq);
 $name = $eq->getName();
@@ -75,58 +67,53 @@ if ($adresseip =='null' || $adresseip =='') {
 $username = $eq->getConfiguration('username');
 $password = $eq->getConfiguration('password');
 
-function json_validate($_test)
-{
-  // Decode pour test erreur
-    $result = json_decode($_test);
-
-
-    if(json_last_error() != JSON_ERROR_NONE) 
-    {
-      throw new Exception(json_last_error());
-      // Exit sur exeption
-      echo "Erreur \n";
-      echo $_error;
-    }
-
-    // Fin sans erreur
-    $_test2 = json_decode($_test);
-    if ($_test2 =='null' || $_test2 =='')
-    {
-      throw new Exception('Fichier Vide');
-    }
-
-    log::add('ONVIF','debug','Aucune erreur dans le décodage du JSON');  
-
-}
-
 
 /************************************************************************
 ***  Découverte des caméras sur le réseau et selection de celle qui   ***
-***  correspond à l'IP   ->probe.js                                   ***
+***  correspond à l'IP   ->discover                                  ***
 *************************************************************************/
-$commande = "node /var/www/html/plugins/PTZONVIF/ressources/probe.js 2>&1";  
-$camerasdiscovery = shell_exec($commande);
-log::add('PTZONVIF','debug','probe.js : '.$camerasdiscovery);
-
-json_validate($camerasdiscovery);
-$cam = json_decode($camerasdiscovery,true);
-$nombrecam = count($cam);
+$onvif = new ponvif2();
+$timeout =config::byKey('timeout', 'PTZONVIF');
+if (is_null($timeout) || $timeout=='' || $timeout>15) {
+	$timeout=3; // valeur par défaut
+}
+log::add('PTZONVIF','debug','Lancement de la recherche sur le réseau avec un timeout de : '.$timeout.' s');
+$onvif->setDiscoveryTimeout($timeout);
+$cam = $onvif->discover();
+$nombrecam =count($cam);
+//var_dump($cam);
 $trouve = false;
 for($i = 0; $i <= $nombrecam-1; $i++) 
 {	
-	$xaddrs = $cam[$i]['xaddrs'] ;
-	$url = implode("", $xaddrs) ;
-	$host=parse_url($url, PHP_URL_HOST);
-	log::add('PTZONVIF','debug','test : '.$url.' - '.$adresseip.' '.$host);
-	if($host == $adresseip) {
-		$port = parse_url($url, PHP_URL_PORT);
-		$urn = $cam[$i]['urn'];
-		$name = $cam[$i]['name'];
-		$location = $cam[$i]['location'];
-		$types = $cam[$i]['types'];   
+	$IPAddr = $cam[$i]['IPAddr'] ;
+	if($IPAddr == $adresseip) {
+		log::add('PTZONVIF','debug','Caméra trouvée : '.json_encode($cam[$i]));
+		$urn = $cam[$i]['EndpointReference']['Address'];
+		$types = $cam[$i]['Types'];   
+		$xaddrs = $cam[$i]['XAddrs'] ; 
+		$scope = $cam[$i]['Scopes'];
+		$scopes = explode(" ",$scope);
+		
+		foreach ($scopes as $scopes_){
+			$paths =parse_url($scopes_,PHP_URL_PATH);
+			$path = explode("/",$paths);
+			switch ($path[1]){
+				case 'name':
+					$name=$path[2];
+					break;
+				case 'location':
+					$location=$path[3];
+					break;
+				case 'hardware':
+					$hardware=$path[2];
+					break;	
+			}
+			
+		}
+		$host=parse_url($xaddrs, PHP_URL_HOST);	
+		$port = parse_url($xaddrs, PHP_URL_PORT);  
 		$trouve = true;
-		log::add('PTZONVIF','debug','trouvé : '.$url);
+		
 		break;
 	}
   
@@ -137,52 +124,93 @@ for($i = 0; $i <= $nombrecam-1; $i++)
 ***  					                                              ***
 *************************************************************************/
 if ($trouve){
-	$eq->setConfiguration('URL',$url);
-	$eq->setConfiguration('port',$port);
-	
 	echo '<tr><td>' . $adresseip . '</td>';
 	echo '<td>' . $port . '</td>';
-	echo '<td>' . $urn . '</td>';
-	echo '<td>' . $name . '</td>';
+	echo '<td>' . $urn . '</td></tr>';
+	
+	echo "<tr style='background-color: #5078aa !important; color: white !important;'>";
+	echo '<th>Name</th>';
+	echo '<th>Location</th></tr>';
+	
+	echo '<tr><td>' . $name . '</td>';
 	echo '<td>' . $location . '</td></tr>';
 	echo '<tr></tr>';
-	echo "<tr style='background-color: grey !important; color: white !important;'>";
+	
+	echo "<tr style='background-color: #5078aa !important; color: white !important;'>";
 	echo '<th>xaddrs</th></tr>';
-	foreach ($xaddrs as $keys=>$value) {
+	$xaddr = explode(" ",$xaddrs);
+	$url = $xaddr[0];
+	foreach ($xaddr as $value) {
 		echo '<tr><td>'.$value.'</td></tr>';
 	}
 	echo '<tr></tr>';
-	echo "<tr style='background-color: grey !important; color: white !important;'>";
+	
+	echo "<tr style='background-color: #5078aa !important; color: white !important;'>";
 	echo '<th>Types</th></tr>';
-	foreach ($types as $keys=>$value) {
+	$type = explode(" ",$types);
+	foreach ($type as $value) {
 		echo '<tr><td>'.$value.'</td></tr>';
 	}
 	echo '<tr></tr>';
+	log::add('PTZONVIF','debug','URL : '.$url.' - Port :'.$port.' - Name : '.$name.' - URN :'.$urn);
+	$eq->setConfiguration('URL',$url);
+	$eq->setConfiguration('port',$port);
+	$eq->setConfiguration('Name',$name);
+	$eq->setConfiguration('URN',$urn);
 	
 /************************************************************************
 ***  Extraction des infos											  ***
-***  Getdevice.js		                                              ***
+***  core_GetDeviceInformation                                        ***
 *************************************************************************/
-	$commande = "node /var/www/html/plugins/PTZONVIF/ressources/Getdevice.js ";
-	$commande .= $url;  
-	$commande .= " ";
-	$commande .= $username;  
-	$commande .= " ";
-	$commande .= $password;  
-	$commande .= " 2>&1";
-	$camerasdiscovery = shell_exec($commande);
-	log::add('PTZONVIF','debug','Getdevice.js : '.$commande);
-	log::add('PTZONVIF','debug','Getdevice.js : '.$camerasdiscovery);
-	json_validate($camerasdiscovery);
-	$cam = json_decode($camerasdiscovery,true);
-	$token = $cam['token'];
-	$snapshot = $cam['snapshot'];
-	$rtsp = $cam['stream']['rtsp'];
+	$onvif->setUsername($eq->getConfiguration('username'));
+	$onvif->setPassword($eq->getConfiguration('password'));
+	$onvif->setIPAddress($IPAddr);
+	$onvif->setMediaUri($xaddr[0]);
+	$onvif->initialize();
+	$version= implode(".",$onvif->getSupportedVersion());
+	
+	$cam = $onvif->core_GetDeviceInformation();
+	//log::add('PTZONVIF','debug','core_GetDeviceInformation : '.json_encode($cam));
+	
+	$eq->setConfiguration('Manufacturer',$cam['Manufacturer']);
+	$eq->setConfiguration('Model',$cam['Model']);
+	$eq->setConfiguration('FirmwareVersion',$cam['FirmwareVersion']);
+	$eq->setConfiguration('SerialNumber',$cam['SerialNumber']);
+	$eq->setConfiguration('HardwareId',$cam['HardwareId']);
+	$eq->setConfiguration('Version',$version);
+	$eq->save();
+	json_export($eq->getConfiguration('Model').'-core_GetDeviceInformation.json',$cam);
+	echo "<tr style='background-color: #5078aa !important; color: white !important;'>";
+	echo '<th>Manufacturer</th>';
+	echo '<th>Model</th></tr>';
+	
+	echo '<tr><td>'.$cam['Manufacturer'].'</td>';
+	echo '<td>'.$cam['Model'].'</td></tr>';
+	
+	echo "<tr style='background-color: #5078aa !important; color: white !important;'>";
+	echo '<th>FirmwareVersion</th>';
+	echo '<th>SerialNumber</th>';
+	echo '<th>HardwareId</th></tr>';
+	
+	echo '<tr><td>'.$cam['FirmwareVersion'].'</td>';
+	echo '<td>'.$cam['SerialNumber'].'</td>';
+	echo '<td>'.$cam['HardwareId'].'</th></td></tr>';
+	echo '<tr></tr>';	
+
+	$profiles =$onvif->media_GetProfiles();
+	$token = $profiles[0]['@attributes']['token'];
+	json_export($eq->getConfiguration('Model').'-media_GetProfiles.json',$profiles);
+	//log::add('PTZONVIF','debug','media_GetProfiles : '.json_encode($profiles));
+	
+	$rtsp = $onvif->media_GetStreamUri($token);
+	$snapshot = $onvif->media_GetSnapshotUri($token);
+
 	$eq->setConfiguration('token',$token);
 	$eq->setConfiguration('snapshot',$snapshot);
 	$eq->setConfiguration('rtsp',$rtsp);
+	$eq->setConfiguration('ptzuri',$onvif->getPTZUri());
 	$eq->save();
-	echo "<tr style='background-color: grey !important; color: white !important;'>";
+	echo "<tr style='background-color: #5078aa !important; color: white !important;'>";
 	echo '<th>Token</th>';
 	echo '<th>snapshot</th>';
 	echo '<th>rtsp</th></tr>';
@@ -191,63 +219,34 @@ if ($trouve){
 	echo '<td>'.$rtsp.'</th></td></tr>';
 	echo '<tr></tr>';
 
-/************************************************************************
-***  Extraction des infos complémentaires											  ***
-***  GetInfo.js		                                              ***
-*************************************************************************/
-	$commande = "node /var/www/html/plugins/PTZONVIF/ressources/GetInfo.js ";
-	$commande .= $url;  
-	$commande .= " ";
-	$commande .= $username;  
-	$commande .= " ";
-	$commande .= $password;  
-	$commande .= " 2>&1";
-	$camerasdiscovery = shell_exec($commande);
-	log::add('PTZONVIF','debug','GetInfos.js : '.$commande);
-	log::add('PTZONVIF','debug','GetInfos.js : '.$camerasdiscovery);
-	json_validate($camerasdiscovery);
-	$cam = json_decode($camerasdiscovery,true);
-	$eq->setConfiguration('Manufacturer',$cam['Manufacturer']);
-	$eq->setConfiguration('Model',$cam['Model']);
-	$eq->setConfiguration('FirmwareVersion',$cam['FirmwareVersion']);
-	$eq->setConfiguration('SerialNumber',$cam['SerialNumber']);
-	$eq->setConfiguration('HardwareId',$cam['HardwareId']);
-	$eq->save();
-	echo "<tr style='background-color: grey !important; color: white !important;'>";
-	echo '<th>Manufacturer</th>';
-	echo '<th>Model</th>';
-	echo '<th>FirmwareVersion</th>';
-	echo '<th>SerialNumber</th>';
-	echo '<th>HardwareId</th></tr>';
-	echo '<tr><td>'.$cam['Manufacturer'].'</td>';
-	echo '<td>'.$cam['Model'].'</td>';
-	echo '<td>'.$cam['FirmwareVersion'].'</td>';
-	echo '<td>'.$cam['SerialNumber'].'</td>';
-	echo '<td>'.$cam['HardwareId'].'</th></td></tr>';
-	echo '<tr></tr>';
+
 	
 /************************************************************************
 ***  Extraction des presets											  ***
-***  GetTokenPreset.js		                                          ***
+***  ptz_GetPresets  		                                          ***
 *************************************************************************/
-	$commande = "node /var/www/html/plugins/PTZONVIF/ressources/GetTokenPreset.js ";
-	$commande .= $url;  
-	$commande .= " ";
-	$commande .= $username;  
-	$commande .= " ";
-	$commande .= $password;  
-	$commande .= " 2>&1";
-	$camerasdiscovery = shell_exec($commande);
-	log::add('PTZONVIF','debug','GetTokenPreset.js : '.$commande);
-	log::add('PTZONVIF','debug','GetTokenPreset.js : '.$camerasdiscovery);
-	$cam = json_decode($camerasdiscovery,true);
-	$nbpreset = count($cam['GetPresetsResponse']['Preset']);
+	
+	
+	
+	$capabilities = $onvif->core_GetCapabilities();
+	$presets = $onvif->ptz_GetPresets($token);
+	json_export($eq->getConfiguration('Model').'-ptz_GetPresets.json',$presets);
+	json_export($eq->getConfiguration('Model').'-capabilities.json',$capabilities);
+
+
+
+
+
+
+
+	$nbpreset = count($presets); 
 	$nbpresetMax = $nbpreset;
 	if ($nbpreset>5) {
 		$nbpresetMax =5;
 	}
-	echo "<tr style='background-color: grey !important; color: white !important;'>";
-	echo '<th>Tokens presets</th></tr>';
+	echo "<tr style='background-color: #5078aa !important; color: white !important;'>";
+	echo '<th>Tokens presets</th>';
+	echo '<th>Name</th></tr>';
 
 	for($i = 0; $i <= 5; $i++) {
 		$cmd = cmd::byEqLogicIdAndLogicalId($ideq,'P'.$i);
@@ -255,9 +254,11 @@ if ($trouve){
 			 log::add('PTZONVIF','debug','erreurcommande : '.'P'.$i);
 		 }
 		if ($i<$nbpresetMax) {
-			$cmd->setConfiguration('api',$cam['GetPresetsResponse']['Preset'][$i]['Name']);
+			$cmd->setConfiguration('api',$presets[$i]['Token']);
+			$cmd->setConfiguration('presetName',$presets[$i]['Name']);
 			$cmd->setIsVisible(1);
-			echo '<tr><td>'.$cam['GetPresetsResponse']['Preset'][$i]['Name'].'</td></tr>';
+			echo '<tr><td>'.$presets[$i]['Token'].'</td>';
+			echo '<td>'.$presets[$i]['Name'].'</td></tr>';
 		}
 		else {
 			$cmd->setConfiguration('api','');
