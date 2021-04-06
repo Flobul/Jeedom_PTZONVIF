@@ -1,3 +1,12 @@
+# 06/04/2021 | Beta V0.92
+* Abandon de NodeJs au profit de la lib php ponvif de Lorenzo Toscano FIX by KuroNeko 03.03.2017 Improved by Cycne 10.06.2017
+* Plus de dépendances à installer
+* Ajout d'infos sur la caméra dans l'écran équipement
+* Modification des options vitesse de déplacement
+* Ajout d'une commande reboot
+* Export automatique des configs caméras dans le répertoire /ressources du plugin pour debug
+* Possibilité d'import automatique du user, mdp et parent à partir du plugin caméra 
+
 # 20/03/2021 | Beta v0.911
 * Modification parametre vitesse ptz par vitesse x (pan) vitesse y (tilt) vitesse z (zoom)
  
