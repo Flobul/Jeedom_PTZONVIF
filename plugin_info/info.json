@@ -1,0 +1,19 @@
+{
+  "id" : "PTZONVIF",
+  "name": "Pilotage cameras ONVIF",
+  "licence": "GPL",
+  "require": "4.0",
+  "version": "1.0",
+  "category": "security",
+  "hasDependency": false,
+  "hasOwnDaemon": false,
+  "link" : {
+		"forum":"https://community.jeedom.com/t/presentation-plugin-ptzonvif-pilotage-des-cameras-onvif/"
+	},
+  "maxDependancyInstallTime": 0,
+  "documentation": "https://freddye83.github.io/Jeedom_PTZONVIF",
+  "changelog": "https://freddye83.github.io/Jeedom_PTZONVIF/fr_FR/changelog",
+  
+  "author": "Freddye83",
+  "compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"]
+}
