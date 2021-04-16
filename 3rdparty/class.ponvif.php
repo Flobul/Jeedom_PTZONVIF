@@ -26,6 +26,8 @@
  * Improved by Freddye83 24.03.2021
  * Renanme class to Ponvif2 for Jeedom(ponvif is use by camera plugin too and not the same)
  * Add function setPTZUri to speed action on ptz (no need initialize())
+ * Add function core_SystemReboot
+ * Catch exception on GetCapabilities (initialize)
 **/
 
 class Ponvif2 {
@@ -184,8 +186,9 @@ class Ponvif2 {
 				  $datetime['Date']['Month'], $datetime['Date']['Day'], $datetime['Date']['Year']);
 			$this->deltatime=time()-$timestamp-5;
 		} catch (Exception $e) {}
-
-		$this->capabilities=$this->core_GetCapabilities();
+		try {
+			$this->capabilities=$this->core_GetCapabilities();
+		} catch (Exception $e) {}
 		$onvifVersion=$this->_getOnvifVersion($this->capabilities);
 		$this->mediauri=$onvifVersion['media'];
 		$this->deviceuri=$onvifVersion['device'];
