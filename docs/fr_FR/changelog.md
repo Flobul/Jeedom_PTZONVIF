@@ -1,3 +1,7 @@
+# 16/04/2021 | Beta V0.921
+* Export automatique du discover.json
+* Contrôle d'exception sur GetCapabilities
+
 # 06/04/2021 | Beta V0.92
 * Abandon de NodeJs au profit de la lib php ponvif de Lorenzo Toscano FIX by KuroNeko 03.03.2017 Improved by Cycne 10.06.2017
 * Plus de dépendances à installer
