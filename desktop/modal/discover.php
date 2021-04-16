@@ -80,6 +80,7 @@ if (is_null($timeout) || $timeout=='' || $timeout>15) {
 log::add('PTZONVIF','debug','Lancement de la recherche sur le réseau avec un timeout de : '.$timeout.' s');
 $onvif->setDiscoveryTimeout($timeout);
 $cam = $onvif->discover();
+json_export('discover.json',$cam);
 $nombrecam =count($cam);
 //var_dump($cam);
 $trouve = false;
@@ -88,6 +89,7 @@ for($i = 0; $i <= $nombrecam-1; $i++)
 	$IPAddr = $cam[$i]['IPAddr'] ;
 	if($IPAddr == $adresseip) {
 		log::add('PTZONVIF','debug','Caméra trouvée : '.json_encode($cam[$i]));
+		
 		$urn = $cam[$i]['EndpointReference']['Address'];
 		$types = $cam[$i]['Types'];   
 		$xaddrs = $cam[$i]['XAddrs'] ; 
@@ -227,11 +229,17 @@ if ($trouve){
 *************************************************************************/
 	
 	
+	try {
+		$capabilities = $onvif->core_GetCapabilities();
+		json_export($eq->getConfiguration('Model').'-capabilities.json',$capabilities);		
+		} 
+	catch(Exception $e){
+		log::add('PTZONVIF','debug','core_GetCapabilities : '.$e);
+		}
 	
-	$capabilities = $onvif->core_GetCapabilities();
 	$presets = $onvif->ptz_GetPresets($token);
 	json_export($eq->getConfiguration('Model').'-ptz_GetPresets.json',$presets);
-	json_export($eq->getConfiguration('Model').'-capabilities.json',$capabilities);
+	
 
 
 
