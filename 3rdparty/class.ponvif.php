@@ -26,6 +26,8 @@
  * Improved by Freddye83 24.03.2021
  * Renanme class to Ponvif2 for Jeedom(ponvif is use by camera plugin too and not the same)
  * Add function setPTZUri to speed action on ptz (no need initialize())
+ * Add function core_SystemReboot
+ * Catch exception on GetCapabilities (initialize)
 **/
 
 class Ponvif2 {
@@ -96,7 +98,7 @@ class Ponvif2 {
 	public function getPassword() { return $this->password; }
 	public function getDeviceUri() { return $this->deviceuri; }
 	public function setDeviceUri($deviceuri) { $this->deviceuri = $deviceuri; }
-	public function getIPAddress($ipAddress) { return $this->ipAddress; }
+	public function getIPAddress() { return $this->ipAddress; }
 	public function setIPAddress($ipAddress) { $this->ipaddress = $ipAddress; }
 	public function getSources() { return $this->sources; }
 	public function getMediaUri() { return $this->mediauri; }
@@ -183,9 +185,10 @@ class Ponvif2 {
 			$timestamp=mktime($datetime['Time']['Hour'], $datetime['Time']['Minute'], $datetime['Time']['Second'],
 				  $datetime['Date']['Month'], $datetime['Date']['Day'], $datetime['Date']['Year']);
 			$this->deltatime=time()-$timestamp-5;
-		} catch (Exception $e) {}
-
-		$this->capabilities=$this->core_GetCapabilities();
+		} catch (Exception $e) {log::add('PTZONVIF','debug','core_GetSystemDateAndTime : '.$e);}
+		try {
+			$this->capabilities=$this->core_GetCapabilities();
+		} catch (Exception $e) {log::add('PTZONVIF','ALERT','core_GetCapabilities : '.$e);}
 		$onvifVersion=$this->_getOnvifVersion($this->capabilities);
 		$this->mediauri=$onvifVersion['media'];
 		$this->deviceuri=$onvifVersion['device'];
@@ -195,8 +198,12 @@ class Ponvif2 {
 		$this->onvifversion=array('major'=>$onvifVersion['major'],
 					  'minor'=>$onvifVersion['minor']);
 
-		$this->videosources=$this->media_GetVideoSources();
-		$this->profiles=$this->media_GetProfiles();
+		try {
+          $this->videosources=$this->media_GetVideoSources();
+        } catch (Exception $e) {log::add('PTZONVIF','ALERT','media_GetVideoSources : '.$e);}
+		try {
+          $this->profiles=$this->media_GetProfiles();
+        }	catch (Exception $e) {log::add('PTZONVIF','ALERT','media_GetProfiles : '.$e);}
 		$this->sources=$this->_getActiveSources($this->videosources,$this->profiles);
 	}
 
@@ -218,7 +225,15 @@ class Ponvif2 {
 
 	public function core_GetCapabilities() {
 		$REQ=$this->_makeToken();
-		$post_string='<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><s:Header><wsse:Security s:mustUnderstand="1" xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><UsernameToken><Username>%%USERNAME%%</Username><Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest">%%PASSWORD%%</Password><Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">%%NONCE%%</Nonce><Created xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">%%CREATED%%</Created></UsernameToken></wsse:Security></s:Header><s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><GetCapabilities xmlns="http://www.onvif.org/ver10/device/wsdl"><Category>All</Category></GetCapabilities></s:Body></s:Envelope>';
+     
+		$post_string='<?xml version="1.0" encoding="UTF-8"?><s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">';
+        $post_string .='<s:Header><wsse:Security s:mustUnderstand="1" xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">';
+        $post_string .='<UsernameToken><Username>%%USERNAME%%</Username><Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest">%%PASSWORD%%</Password>';
+        $post_string .='<Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">%%NONCE%%</Nonce><Created xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">%%CREATED%%</Created></UsernameToken></wsse:Security></s:Header>';
+      
+        $post_string .='<s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><GetCapabilities xmlns="http://www.onvif.org/ver10/device/wsdl"><Category>All</Category></GetCapabilities></s:Body></s:Envelope>';
+      //echo htmlspecialchars($post_string,ENT_QUOTES);
+      
 		$post_string=str_replace(array("%%USERNAME%%",
                                "%%PASSWORD%%",
                                "%%NONCE%%",
@@ -345,7 +360,12 @@ class Ponvif2 {
 	
 	public function media_GetStreamUri($profileToken,$stream="RTP-Unicast",$protocol="RTSP") {
 		$REQ=$this->_makeToken();
-		$post_string='<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><s:Header><wsse:Security s:mustUnderstand="1" xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><UsernameToken><Username>%%USERNAME%%</Username><Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest">%%PASSWORD%%</Password><Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">%%NONCE%%</Nonce><Created xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">%%CREATED%%</Created></UsernameToken></wsse:Security></s:Header><s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><GetStreamUri xmlns="http://www.onvif.org/ver10/media/wsdl"><StreamSetup><Stream xmlns="http://www.onvif.org/ver10/schema">%%STREAM%%</Stream><Transport xmlns="http://www.onvif.org/ver10/schema"><Protocol>%%PROTOCOL%%</Protocol></Transport></StreamSetup><ProfileToken>%%PROFILETOKEN%%</ProfileToken></GetStreamUri></s:Body></s:Envelope>';
+      $post_string='';
+		$post_string='<?xml version="1.0" encoding="UTF-8"?><s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><s:Header><wsse:Security s:mustUnderstand="1" xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><UsernameToken><Username>%%USERNAME%%</Username><Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest">%%PASSWORD%%</Password><Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">%%NONCE%%</Nonce><Created xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">%%CREATED%%</Created></UsernameToken></wsse:Security></s:Header><s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><GetStreamUri xmlns="http://www.onvif.org/ver10/media/wsdl"><StreamSetup><Stream xmlns="http://www.onvif.org/ver10/schema">%%STREAM%%</Stream><Transport xmlns="http://www.onvif.org/ver10/schema"><Protocol>%%PROTOCOL%%</Protocol></Transport></StreamSetup><ProfileToken>%%PROFILETOKEN%%</ProfileToken></GetStreamUri></s:Body></s:Envelope>';
+      
+     // $post_string='<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope"><s:Header><Security s:mustUnderstand="1" xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><UsernameToken><Username>%%USERNAME%%</Username><Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest">%%PASSWORD%%</Password><Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">%%NONCE%%</Nonce><Created xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">%%CREATED%%</Created></UsernameToken></Security></s:Header><s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><GetStreamUri xmlns="http://www.onvif.org/ver10/media/wsdl"><StreamSetup><Stream xmlns="http://www.onvif.org/ver10/schema">%%STREAM%%</Stream><Transport xmlns="http://www.onvif.org/ver10/schema"><Protocol>%%PROTOCOL%%</Protocol></Transport></StreamSetup><ProfileToken>%%PROFILETOKEN%%</ProfileToken></GetStreamUri></s:Body></s:Envelope>';
+
+
 		$post_string=str_replace(array("%%USERNAME%%",
                                "%%PASSWORD%%",
                                "%%NONCE%%",
@@ -361,10 +381,13 @@ class Ponvif2 {
 			       $stream,
 			       $protocol),
                          $post_string);
+      
 		if ($this->isFault($response=$this->_send_request($this->mediauri,$post_string))) {
+          	
 			if ($this->intransingent) throw new Exception('GetStreamUri: Communication error');
 		}
 		else
+           
 			return $response['Envelope']['Body']['GetStreamUriResponse']['MediaUri']['Uri'];
 	}
 
@@ -382,6 +405,7 @@ class Ponvif2 {
 			$REQ['TIMESTAMP'],
 			$profileToken),
 		$post_string);
+      
 		if ($this->isFault($response=$this->_send_request($this->mediauri,$post_string))) {
 		if ($this->intransingent) throw new Exception('GetSnapshotUri: Communication error');
 			var_dump($response);
@@ -573,7 +597,11 @@ class Ponvif2 {
 		if ($this->ptzuri=='') return array();
 	        $REQ=$this->_makeToken();
 		$post_string='<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><s:Header><wsse:Security s:mustUnderstand="1" xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><UsernameToken><Username>%%USERNAME%%</Username><Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest">%%PASSWORD%%</Password><Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">%%NONCE%%</Nonce><Created xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">%%CREATED%%</Created></UsernameToken></wsse:Security></s:Header><s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><GetPresets xmlns="http://www.onvif.org/ver20/ptz/wsdl"><ProfileToken>%%PROFILETOKEN%%</ProfileToken></GetPresets></s:Body></s:Envelope>';
-		$post_string=str_replace(array("%%USERNAME%%",
+		
+
+      
+      
+      $post_string=str_replace(array("%%USERNAME%%",
                                "%%PASSWORD%%",
                                "%%NONCE%%",
                                "%%CREATED%%",
@@ -584,10 +612,12 @@ class Ponvif2 {
                                $REQ['TIMESTAMP'],
 			       $profileToken),
                          $post_string);
+      log::add('PTZONVIF','debug','GetPresets post :'.htmlspecialchars($post_string,ENT_QUOTES));
 		if ($this->isFault($response=$this->_send_request($this->ptzuri,$post_string))) {
 			if ($this->intransingent) throw new Exception('GetPresets: Communication error');
 		}
 		else {
+          log::add('PTZONVIF','debug','GetPresets :'.htmlspecialchars($response,ENT_QUOTES));
 			$getpresetsresponse=$response['Envelope']['Body']['GetPresetsResponse']['Preset'];
 			$presets=array();
 			foreach ($getpresetsresponse as $preset) {
@@ -960,22 +990,33 @@ class Ponvif2 {
 	}
 	
 	protected function _xml2array($response) {
+      try {
 		$sxe = new SimpleXMLElement($response);
+      
 		$dom_sxe = dom_import_simplexml($sxe);
 		$dom = new DOMDocument('1.0');
 		$dom_sxe = $dom->importNode($dom_sxe, true);
 		$dom_sxe = $dom->appendChild($dom_sxe);
 		$element = $dom->childNodes->item(0);
+      //log::add('PTZONVIF','debug',$response);
 		foreach ($sxe->getDocNamespaces() as $name => $uri) {
     			$element->removeAttributeNS($uri, $name);
 		}
+      //log::add('PTZONVIF','debug','xml2: ');
 		$xmldata=$dom->saveXML();
 		$xmldata=substr($xmldata,strpos($xmldata,"<Envelope>"));
 		$xmldata=substr($xmldata,0,strpos($xmldata,"</Envelope>")+strlen("</Envelope>"));
 		$xml=simplexml_load_string($xmldata);
+     // log::add('PTZONVIF','debug','xml3: ');
 		$data=json_decode(json_encode((array)$xml),1);
+      //log::add('PTZONVIF','debug','xml4: ');
 		$data=array($xml->getName()=>$data);
+     // log::add('PTZONVIF','debug','xml5: ');
 		return $data;
+      }
+      catch (Exception $e){
+		log::add('PTZONVIF','ALERT','_xml2array : '.$e.'xml :'.htmlspecialchars($response,ENT_QUOTES));
+      }
 	}
 
 	protected function _passwordDigest( $username, $password, $timestamp = "default", $nonce = "default" ) {
@@ -1012,8 +1053,13 @@ class Ponvif2 {
 		//curl_setopt($soap_do, CURLOPT_USERPWD, $user . ":" . $password); // HTTP authentication
 		if ( ($result = curl_exec($soap_do)) === false) {
 			$err = curl_error($soap_do);
+          
 			$this->lastresponse=array("Fault"=>$err);
+          log::add('PTZONVIF','alert','fault :'.htmlspecialchars($result,ENT_QUOTES));
 		} else {
+          	//log::add('PTZONVIF','debug','result : '.$result);
+          //log::add('PTZONVIF','debug','send response'.htmlspecialchars($result,ENT_QUOTES));
+          //log::add('PTZONVIF','debug','send response'.$result);
 			$this->lastresponse=$this->_xml2array($result);
 		}
 		return $this->lastresponse;
