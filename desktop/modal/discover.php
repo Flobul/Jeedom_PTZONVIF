@@ -15,6 +15,10 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 require_once dirname(__FILE__).'/../../3rdparty/class.ponvif.php';
+//include_file('3rdparty', dirname(__FILE__).'/../../json-view-master/dist/jsonview', 'js');
+//include_file('3rdparty', 'jquery.fileTree/jqueryFileTree', 'css', 'script');
+//include_file('3rdparty', 'codemirror/lib/codemirror', 'js');
+//include_file('3rdparty', 'codemirror/lib/codemirror', 'css');
 //require_once __DIR__ . '/../../vendor/autoload.php';
 if (!isConnect('admin')) {
     throw new Exception('{{401 - Accès non autorisé}}');
@@ -169,16 +173,26 @@ if ($trouve){
 	$onvif->setIPAddress($IPAddr);
 	$onvif->setMediaUri($xaddr[0]);
 	$onvif->initialize();
-	$version= implode(".",$onvif->getSupportedVersion());
+  	
+	try{$version= implode(".",$onvif->getSupportedVersion());}
+	catch(Exception $e){
+		log::add('PTZONVIF','ALERT','getSupportedVersion : '.$e);
+	}
+	try {
+      $cam = $onvif->core_GetDeviceInformation();
+      $eq->setConfiguration('Manufacturer',$cam['Manufacturer']);
+      $eq->setConfiguration('Model',$cam['Model']);
+      $eq->setConfiguration('FirmwareVersion',$cam['FirmwareVersion']);
+      $eq->setConfiguration('SerialNumber',$cam['SerialNumber']);
+      $eq->setConfiguration('HardwareId',$cam['HardwareId']);
+      log::add('PTZONVIF','debug','core_GetDeviceInformation : '.json_encode($cam));
+    }
+  	catch(Exception $e){
+		log::add('PTZONVIF','ALERT','core_GetDeviceInformation : '.$e);
+	}
 	
-	$cam = $onvif->core_GetDeviceInformation();
-	//log::add('PTZONVIF','debug','core_GetDeviceInformation : '.json_encode($cam));
 	
-	$eq->setConfiguration('Manufacturer',$cam['Manufacturer']);
-	$eq->setConfiguration('Model',$cam['Model']);
-	$eq->setConfiguration('FirmwareVersion',$cam['FirmwareVersion']);
-	$eq->setConfiguration('SerialNumber',$cam['SerialNumber']);
-	$eq->setConfiguration('HardwareId',$cam['HardwareId']);
+	
 	$eq->setConfiguration('Version',$version);
 	$eq->save();
 	json_export($eq->getConfiguration('Model').'-core_GetDeviceInformation.json',$cam);
@@ -198,20 +212,40 @@ if ($trouve){
 	echo '<td>'.$cam['SerialNumber'].'</td>';
 	echo '<td>'.$cam['HardwareId'].'</th></td></tr>';
 	echo '<tr></tr>';	
-
-	$profiles =$onvif->media_GetProfiles();
-	$token = $profiles[0]['@attributes']['token'];
-	json_export($eq->getConfiguration('Model').'-media_GetProfiles.json',$profiles);
-	//log::add('PTZONVIF','debug','media_GetProfiles : '.json_encode($profiles));
 	
-	$rtsp = $onvif->media_GetStreamUri($token);
-	$snapshot = $onvif->media_GetSnapshotUri($token);
+	try {	
+      $profiles =$onvif->media_GetProfiles();
+      $token = $profiles[0]['@attributes']['token'];
+  	  $eq->setConfiguration('token',$token);
+	  json_export($eq->getConfiguration('Model').'-media_GetProfiles.json',$profiles);
+      try { 
+      $rtsp = $onvif->media_GetStreamUri($token);
+      $eq->setConfiguration('rtsp',$rtsp);
+      } 
+      catch(Exception $e){
+        log::add('PTZONVIF','ALERT','media_GetStreamUri : '.$e);
+      }
+      try {
+        $snapshot = $onvif->media_GetSnapshotUri($token);
+        $eq->setConfiguration('snapshot',$snapshot);
+      }
+      catch(Exception $e){
+        log::add('PTZONVIF','ALERT','media_GetSnapshotUri : '.$e);
+      }
+    }
+  	catch(Exception $e){
+		log::add('PTZONVIF','ALERT','media_GetProfiles : '.$e);
+	}
+	
 
-	$eq->setConfiguration('token',$token);
-	$eq->setConfiguration('snapshot',$snapshot);
-	$eq->setConfiguration('rtsp',$rtsp);
-	$eq->setConfiguration('ptzuri',$onvif->getPTZUri());
+	
+	
+	try {$eq->setConfiguration('ptzuri',$onvif->getPTZUri());}
+  	catch(Exception $e){
+		log::add('PTZONVIF','ALERT','getPTZUri : '.$e);
+	}
 	$eq->save();
+  	
 	echo "<tr style='background-color: #5078aa !important; color: white !important;'>";
 	echo '<th>Token</th>';
 	echo '<th>snapshot</th>';
@@ -227,18 +261,23 @@ if ($trouve){
 ***  Extraction des presets											  ***
 ***  ptz_GetPresets  		                                          ***
 *************************************************************************/
-	
+
 	
 	try {
 		$capabilities = $onvif->core_GetCapabilities();
 		json_export($eq->getConfiguration('Model').'-capabilities.json',$capabilities);		
 		} 
 	catch(Exception $e){
-		log::add('PTZONVIF','debug','core_GetCapabilities : '.$e);
+		log::add('PTZONVIF','ALERT','core_GetCapabilities : '.$e);
 		}
-	
-	$presets = $onvif->ptz_GetPresets($token);
-	json_export($eq->getConfiguration('Model').'-ptz_GetPresets.json',$presets);
+ 
+	try {
+		$presets = $onvif->ptz_GetPresets($token);
+		json_export($eq->getConfiguration('Model').'-ptz_GetPresets.json',$presets);
+		} 
+	catch(Exception $e){
+		log::add('PTZONVIF','ALERT','ptz_GetPresets : '.$e);
+		}      
 	
 
 
@@ -284,6 +323,34 @@ else {
 }
 
 ?>
+ 
 	</tbody>
 </table>
+	Caméras
+    <div class="root"></div>
+  	Profiles
+  	<div class="profiles"></div>
+    capabilities
+    <div class="capabilities"></div>
+    presets
+    <div class="presets"></div>
+    
 
+
+  <script type="text/javascript" src="plugins/PTZONVIF/3rdparty/json-view-master/dist/jsonview.js"></script>
+  <script type="text/javascript">
+      	const tree = jsonview.create(<?php echo json_encode($cam); ?>);
+		const tree2 = jsonview.create(<?php echo json_encode($profiles); ?>);
+		const tree3 = jsonview.create(<?php echo json_encode($capabilities); ?>);
+		const tree4 = jsonview.create(<?php echo json_encode($presets); ?>);
+      	jsonview.render(tree, document.querySelector('.root'));
+		jsonview.collapse(tree);
+		jsonview.render(tree2, document.querySelector('.profiles'));
+		jsonview.collapse(tree2);
+		jsonview.render(tree3, document.querySelector('.capabilities'));
+		jsonview.collapse(tree3);
+		jsonview.render(tree4, document.querySelector('.presets'));
+		jsonview.collapse(tree4);
+
+
+  </script>
