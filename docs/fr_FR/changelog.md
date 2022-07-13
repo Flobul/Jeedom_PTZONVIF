@@ -1,5 +1,5 @@
 # 11/07/2022 | Beta V0.93
-* Meilleur gestion des exceptions (les erreurs sont remontées en log, duent en grande partie à une incompatibilité partielle de la caméra)
+* Meilleur gestion des exceptions (les erreurs sont remontées en log, dues en grande partie à une incompatibilité partielle de la caméra)
 * Ajout de treeview avec le détail découvert sur la fenêtre d'analyse.
 
 # 16/04/2021 | Beta V0.921
